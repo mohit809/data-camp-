@@ -1,0 +1,398 @@
+# Text summarization
+One really common use case for using OpenAI models is summarizing text. This has a ton of applications in business settings, including summarizing reports into concise one-pagers or a handful of bullet points, or extracting the next steps and timelines for different stakeholders.
+
+In this exercise, you'll summarize a passage of text on financial investment (finance_text) into two concise bullet points using a chat completion model.
+
+## Instructions
+70 XP
+Use an f-string to insert finance_text into prompt.
+Create a request, sending the prompt provided; use a maximum of 400 tokens.
+
+---------------------------soluton
+client = OpenAI(api_key="<OPENAI_API_TOKEN>")
+
+# Use an f-string to format the prompt
+prompt = f"""Summarize the following text into two concise bullet points:
+{finance_text}"""
+
+# Create a request to the Chat Completions endpoint
+response = client.chat.completions.create(
+  model="gpt-4o-mini",
+  messages=[{"role": "user", "content": prompt}],
+  max_completion_tokens = 400
+)
+
+print(response.choices[0].message.content)
+==================================================================================
+
+#Calculating the cost#
+Before deploying AI features at scale, it's essential to estimate costs. The cost is dependent on the number of input and output tokens used and the model chosen.
+
+Your task is to calculate the cost of summarizing customer chat transcripts.
+
+The OpenAI client, along with text, prompt, and max_completion_tokens, are preloaded for you.
+
+Instructions
+100 XP
+Extract the input token usage from the response.
+Complete the cost calculation to add the output token cost.'
+
+------------------
+solution
+-----------------
+
+client = OpenAI(api_key="<OPENAI_API_TOKEN>")
+
+response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[{"role": "user", "content": prompt}],
+    max_completion_tokens=max_completion_tokens
+)
+
+input_token_price = 0.15 / 1_000_000
+output_token_price = 0.6 / 1_000_000
+
+# Extract token usage
+input_tokens = response.usage.prompt_tokens
+output_tokens = max_completion_tokens
+# Calculate cost
+cost = (input_tokens * input_token_price +output_tokens * output_token_price)
+print(f"Estimated cost: ${cost}")
+
+========================================================================================================
+##Content generation
+AI is playing a much greater role in content generation, from creating marketing content such as blog post titles to creating outreach email templates for sales teams.
+
+In this exercise, you'll harness AI to generate a catchy slogan for a new restaurant. Feel free to test out different prompts, such as varying the type of cuisine (Italian, Chinese, etc.) or the type of restaurant (fine-dining, fast-food, etc.), to see how the response changes.
+
+Instructions
+100 XP
+Create a request to create a slogan for a new restaurant; set the maximum number of tokens to 100.
+
+code----------------
+
+client = OpenAI(api_key="<OPENAI_API_TOKEN>")
+
+# Create a request to the Chat Completions endpoint
+response = client.chat.completions.create(
+  model="gpt-4o-mini",
+  messages=[{"role": "user", "content": "Summarize the following chat transcript."}],
+  max_completion_tokens=100
+)
+
+print(response.choices[0].message.content)
+
+===================================================================================
+
+Generating a product description
+Imagine you're writing marketing copy for SonicPro headphones. Your goal is to generate a persuasive product description using the OpenAI API.
+
+Test how different prompting techniques, response lengths, and temperature settings influence the output!
+
+Instructions
+100 XP
+Create a detailed prompt to generate a product description for SonicPro headphones, including:
+Active noise cancellation (ANC)
+40-hour battery life
+Foldable design
+Experiment with max_completion_tokens and temperature settings to see how they affect the output.
+
+Take Hint (-30 XP)----------------------
+
+client = OpenAI(api_key="<OPENAI_API_TOKEN>")
+
+# Create a detailed prompt
+prompt = """
+Summarize the following customer chat transcript in 3-4 bullet points,
+focusing on key issues raised and the resolution provided.
+"""
+
+response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[{"role": "user", "content": prompt}],
+    # Experiment with max_completion_tokens and temperature settings
+    max_completion_tokens=150,  # enough space for a summary
+    temperature=0.7             # controls creativity (0=deterministic, 1=creative)
+)
+
+print(response.choices[0].message.content)
+==========================================================
+Zero-shot prompting with reviews
+As well as answering questions, transforming text, and generating new text, OpenAI's models can also be used for classification tasks, such as categorization and sentiment analysis.
+
+In this exercise, you'll explore using OpenAI's chat models for sentiment classification using reviews from an online shoe store called Toe-Tally Comfortable.
+
+Instructions
+100 XP
+Define a prompt to classify the sentiment of the statements provided using the numbers 1 to 5 (positive to negative).
+Create a request to the Chat Completions endpoint to send this prompt to gpt-4o-mini.
+
+
+Take Hint (-30 XP)-------------------------------------
+
+client = OpenAI(api_key="<OPENAI_API_TOKEN>")
+
+# Define a multi-line prompt to classify sentiment
+prompt = """Classify the sentiment of the following reviews as Positive, Negative, or Neutral:
+1. Unbelievably good!
+2. Shoes fell apart on the second use.
+3. The shoes look nice, but they aren't very comfortable.
+4. Can't wait to show them off!"""
+
+# Create a request to the Chat Completions endpoint
+response = client.chat.completions.create(
+  model="gpt-4o-mini",
+  messages=[{"role": "user", "content": prompt}],
+  max_completion_tokens=100
+)
+
+print(response.choices[0].message.content)
+=============================================================================================================================================
+
+One-shot prompting: will it be enough?
+As you saw, there's room for improvement in your initial prompt. Try adding an example Love these! = 5 and including = after each review to see if you can get more consistent formatting and more accurate numbers.
+
+Instructions
+100 XP
+Add the example Love these! = 5 to the start of the prompt, and add = after each review in the prompt to indicate how the result should be formatted.
+
+Take Hint (-30 XP)-------------------------------------------------------
+
+
+
+client = OpenAI(api_key="<OPENAI_API_TOKEN>")
+
+# Add the example to the prompt
+prompt = """Classify sentiment as 1-5 (negative to positive):
+1. ____
+2. Unbelievably good! ____
+3. Shoes fell apart on the second use. ____
+4. The shoes look nice, but they aren't very comfortable. ____
+5. Can't wait to show them off! ____"""
+
+response = client.chat.completions.create(model="gpt-4o-mini", messages=[{"role": "user", "content": prompt}], max_completion_tokens=100)
+print(response.choices[0].message.content)
+
+======================================================================================================
+
+Few-shot prompting: all the examples!
+Now for the finale! Try adding the example Comfortable, but not very pretty = 2 to the prompt. As this example is more moderate, it might help the model with the troublesome second-to-last review.
+
+Instructions
+100 XP
+Add the Comfortable, but not very pretty = 2 example to the prompt and re-run the request.
+
+Take Hint (-30 XP)-----------------------------------------------------
+
+client = OpenAI(api_key="<OPENAI_API_TOKEN>")
+
+# Add the final example
+prompt = """Classify sentiment as 1-5 (negative to positive):
+1. ____
+2. Love these! = 5
+3. Unbelievably good! = 
+4. Shoes fell apart on the second use. = 
+5. The shoes look nice, but they aren't very comfortable. = 
+6. Can't wait to show them off! = """
+
+response = client.chat.completions.create(model="gpt-4o-mini", messages=[{"role": "user", "content": prompt}], max_completion_tokens=100)
+print(response.choices[0].message.content)
+=========================================================================================================
+
+Utilizing systems messages
+The Chat Completions endpoint supports three different roles to shape the messages sent to the model:
+
+System: controls assistant's behavior
+User: instruct the assistant
+Assistant: response to user instruction
+In this exercise, you'll begin to design an AI system for helping people learn new skills, using a system message to set an appropriate model behavior.
+
+Instructions
+70 XP
+Create a request using both system and user messages to create a study plan to learn to speak Dutch.
+Extract and print the assistant's text response.
+--------------------------
+
+client = OpenAI(api_key="<OPENAI_API_TOKEN>")
+
+# Create a request to the Chat Completions endpoint
+response = client.chat.completions.create(
+  model="gpt-4o-mini",
+  max_completion_tokens=150,
+  messages=[
+    {"role": "system",
+     "content": "You are a study planning assistant that creates plans for learning new skills."},
+    {"role": "user",
+     "content": "I want to learn to speak Dutch."}
+  ]
+)
+
+# Extract the assistant's text response
+print(response.choices[0].message.content)
+================================================================================================
+
+Adding guardrails
+One of the most popular uses of system messages is to add guardrails, which places restrictions on model outputs.
+
+In this exercise, you'll place a restriction on model outputs preventing learning plans not related to languages, as your system is beginning to find its niche in that space. You'll design a custom message for users requesting these type of learning plans so they understand this change.
+
+Instructions
+100 XP
+Complete the chat request, providing the system message in sys_msg and test a user message containing a non-language-related skill, such as rollerskating.
+
+Take Hint (-30 XP)--------------------------------------------------
+
+client = OpenAI(api_key="<OPENAI_API_TOKEN>")
+
+sys_msg = """You are a study planning assistant that creates plans for learning new skills.
+
+If these skills are non related to languages, return the message:
+
+'Apologies, to focus on languages, we no longer create learning plans on other topics.'
+"""
+
+# Create a request to the Chat Completions endpoint
+response = client.chat.completions.create(
+  model="gpt-4o-mini",
+  messages=[
+    {"role": "system", "content": sys_msg},
+    {"role": "user", "content": "Help me learn to rollerskating."}
+  ]
+)
+
+print(response.choices[0].message.content)
+=======================================================================================================================================================================================================
+Adding assistant messages
+Chat models are great for creating conversational applications, but they can be further improved by providing part of a conversation for the model to build on.
+
+Improve this geography tutor application by including this example student prompt and ideal model response in the messages:
+
+Example Question: Give me a quick summary of Portugal.
+Example Answer: Portugal is a country in Europe that borders Spain. The capital city is Lisboa.
+Instructions
+100 XP
+Add the example question and answer provided as a user-assistant pair in the messages sent to the model.
+Example Question: Give me a quick summary of Portugal.
+Example Answer: Portugal is a country in Europe that borders Spain. The capital city is Lisboa.
+----------------------------------------------
+client = OpenAI(api_key="<OPENAI_API_TOKEN>")
+
+response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    # Add a user and assistant message for in-context learning
+    messages=[
+        {"role": "system", "content": "You are a helpful Geography tutor that generates concise summaries for different countries."},
+        {"role": "user", "content": "Give me a quick summary of Portugal."},
+        {"role": "assistant", "content": "Portugal is a country in Europe that borders Spain. The capital city is Lisboa."},
+        {"role": "user", "content": "Give me a quick summary of Greece."}
+    ]
+)
+
+print(response.choices[0].message.content)
+
+=========================================================================
+
+More assistant messages!
+Expand on your previous messages to provide additional examples, stored as example1, response1, example2, response2, example3, and response3.
+
+Let's see if we can get this model outputting information in the desired format!
+
+Instructions
+100 XP
+Expand your previous messages to include additional examples of other countries, which are stored as example1, response1, example2, response2, example3, and response3.
+------------------------------------------------------------
+
+client = OpenAI(api_key="<OPENAI_API_TOKEN>")
+
+response = client.chat.completions.create(
+   model="gpt-4o-mini",
+   # Add in the extra examples and responses
+   messages=[
+       {"role": "system", "content": "You are a helpful Geography tutor that generates concise summaries for different countries."},
+       {"role": "user", "content": "Give me a quick summary of Portugal."},
+       {"role": "assistant", "content": "Portugal is a country in Europe that borders Spain. The capital city is Lisboa."},
+       {"role": "user", "content": example1},
+       {"role": "assistant", "content": response1},
+       {"role": "user", "content": example2},
+       {"role": "assistant", "content": response2},
+       {"role": "user", "content": example3},
+       {"role": "assistant", "content": response3},
+       {"role": "user", "content": "Give me a quick summary of Greece."}
+   ]
+)
+
+print(response.choices[0].message.content)
+================================================================================================
+
+Creating a conversation history
+An online math learning platform called Easy as Pi has contracted you to help them develop an AI tutor. You immediately see that you can build this application by utilizing the OpenAI API, and start to design a simple proof-of-concept (POC) for the major stakeholders at the company to review.
+
+To start, you'll demonstrate how responses to student messages can be stored in a message history, which will enable full conversations.
+
+Instructions
+100 XP
+Send messages to the model in a chat request.
+Extract the assistant message from response, convert it to a message dictionary, and append it to messages.
+-------------------------------------------------------------
+client = OpenAI(api_key="<OPENAI_API_TOKEN>")
+
+messages = [
+    {"role": "system", "content": "You are a helpful math tutor that speaks concisely."},
+    {"role": "user", "content": "Explain what pi is."}
+]
+
+# Send the chat messages to the model
+response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=messages,
+    max_completion_tokens=100
+)
+
+# Extract the assistant message from the response
+assistant_dict = {"role": "assistant", "content": response.choices[0].message.content}
+
+# Add assistant_dict to the messages dictionary
+messages.append(assistant_dict)
+print(messages)
+
+=======================================================================================
+
+Creating an AI chatbot
+To complete your POC, you'll integrate your message history with a for loop, so you can send repeated prompts to the model, storing each response in the message history in series.
+
+Instructions
+100 XP
+Loop over the user messages (user_msgs).
+Create a dictionary for the user message in each iteration, and append it to messages.
+Send messages to the model in a chat request.
+Append the assistant message dictionary to messages.
+--------------------------------------------------------------------------------------------
+
+client = OpenAI(api_key="<OPENAI_API_TOKEN>")
+
+messages = [{"role": "system", "content": "You are a helpful math tutor that speaks concisely."}]
+user_msgs = ["Explain what pi is.", "Summarize this in two bullet points."]
+
+# Loop over the user questions
+for q in user_msgs:
+    print("User:", q)
+    
+    # Add user message
+    user_dict = {"role": "user", "content": q}
+    messages.append(user_dict)
+    
+    # Create the API request
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=messages,
+        max_completion_tokens=100
+    )
+    
+    # Add assistant's response
+    assistant_dict = {"role": "assistant", "content": response.choices[0].message.content}
+    messages.append(assistant_dict)
+    
+    print("Assistant:", response.choices[0].message.content, "\n")
+======================================================================================================================================
+
+
