@@ -395,4 +395,62 @@ for q in user_msgs:
     print("Assistant:", response.choices[0].message.content, "\n")
 ======================================================================================================================================
 
+Building prompts for sequential chains
+Over the next couple of exercises, you'll work to create a system for helping people learn new skills. This system needs to be built sequentially, so learners can modify plans based on their preferences and constraints. You'll utilize your LangChain LCEL skills to build a sequential chain to build this system, and the first step is to design the prompt templates that will be used by this system.
+
+Instructions
+100 XP
+Create a prompt template called learning_prompt that takes an input "activity" and creates a learning plan.
+Create a prompt template called time_prompt that takes an input "learning_plan" and modifies it to fit within one week.
+Invoke the learning_prompt with an activity of your choice (try "play golf" if you're struggling for ideas).
+----------------------------------------
+# Create a prompt template that takes an input activity
+learning_prompt = PromptTemplate(
+    input_variables=["activity"],
+    template="I want to learn how to {activity}. Can you suggest how I can learn this step-by-step?"
+)
+
+# Create a prompt template that places a time constraint on the output
+time_prompt = PromptTemplate(
+    input_variables=["learning_plan"],
+    template="I only have one week. Can you create a plan to help me hit this goal: {learning_plan}."
+)
+
+# Invoke the learning_prompt with an activity
+print(learning_prompt.invoke({"activity": "play golf"}))
+
+=================================================================
+
+Exercise
+Exercise
+Sequential chains with LCEL
+With your prompt templates created, it's time to tie everything together, including the LLM, using chains and LCEL. An llm has already been defined for you that uses OpenAI's gpt-4o-mini model
+
+For the final step of calling the chain, feel free to insert any activity you wish! If you're struggling for ideas, try inputting "play the harmonica".
+
+Instructions
+0 XP
+Create a sequential chain using LCEL that passes learning_prompt into the llm, and feeds the output into time_prompt for resending to the llm.
+Call the chain with the activity of your choice!
+
+
+------------------------------------------------------------
+
+Exercise
+Exercise
+Sequential chains with LCEL
+With your prompt templates created, it's time to tie everything together, including the LLM, using chains and LCEL. An llm has already been defined for you that uses OpenAI's gpt-4o-mini model
+
+For the final step of calling the chain, feel free to insert any activity you wish! If you're struggling for ideas, try inputting "play the harmonica".
+
+Instructions
+0 XP
+Create a sequential chain using LCEL that passes learning_prompt into the llm, and feeds the output into time_prompt for resending to the llm.
+Call the chain with the activity of your choice!
+
+
+=======================================================================
+
+
+
 
